@@ -45,7 +45,7 @@ async def get_alerts(state: str) -> str:
         state: Two-Letter US State Code. (example: CA, NY)
     """
     url = f"{NWS_API_BASE}/alerts/active/area/{state}"
-    data = make_nws_req(url)
+    data = await make_nws_req(url)
     if not data or "features" not in data:
         return "Unable to fetch alerts, or no alerts found."
     if not data["features"]:
@@ -70,7 +70,7 @@ async def get_forecast(latitude: float, longitude: float) -> str:
             return "Unable to fetch the forecast data for this endpoint."
         
         forecast_url = points_data["properties"]["forecast"]
-        forecast_data = make_nws_req(forecast_url)
+        forecast_data = await make_nws_req(forecast_url)
 
         if not forecast_data:
             return "Unable to fetch detailed forecast."
@@ -82,11 +82,11 @@ async def get_forecast(latitude: float, longitude: float) -> str:
             forecast = f"""
                         Period: {period['name']}
                         Temperature: {period['temperature']}˚{period['temperatureUnit']}
-                        Wind: {period['wind']} {period["windDirection"]}
+                        Wind: {period['windSpeed']} {period["windDirection"]}
                         Forecast" {period['detailedForecast']}
                         """
-            forecasts.append(forecasts)
-            return "\n---\n".join(forecasts)
+            forecasts.append(forecast)
+        return "\n---\n".join(forecasts)
         
 def main():
     mcp.run(transport='stdio')
