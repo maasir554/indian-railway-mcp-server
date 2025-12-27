@@ -9,13 +9,12 @@ load_dotenv()
 TRAIN_STATUS_API_BASE = os.getenv("TRAIN_STATUS_API_BASE")
 
 
-async def fetch_train_status(train_number: str, train_date: str) -> TrainStatusResponse | None:
+async def fetch_train_status(train_number: str) -> TrainStatusResponse | None:
     """
     Fetch live train status from the API.
     
     Args:
         train_number: The train number (e.g., "12618")
-        train_date: The date in DD-MMM-YYYY format (e.g., "26-Dec-2025")
     
     Returns:
         TrainStatusResponse if successful, None otherwise
@@ -24,11 +23,10 @@ async def fetch_train_status(train_number: str, train_date: str) -> TrainStatusR
     
     url = f"{TRAIN_STATUS_API_BASE}/trains/live-status"
     params = {
-        "trainNo": train_number,
-        "date": train_date
+        "trainNo": train_number
     }
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(follow_redirects=True) as client:
         try:
             response = await client.get(url, params=params, timeout=30.0)
             response.raise_for_status()
@@ -63,7 +61,7 @@ async def get_station_codes_from_name(station_name: str, limit: int = 8) -> list
         "limit": limit
     }
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(follow_redirects=True) as client:
         try:
             response = await client.get(url, params=params, timeout=30.0)
             response.raise_for_status()
@@ -100,7 +98,7 @@ async def get_train_numbers_from_name(train_name: str, limit: int = 8) -> list[T
         "limit": limit
     }
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(follow_redirects=True) as client:
         try:
             response = await client.get(url, params=params, timeout=30.0)
             response.raise_for_status()

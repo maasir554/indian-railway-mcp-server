@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 from datetime import datetime
 
@@ -19,13 +19,12 @@ class StationSearchResponse(BaseModel):
 
 class TrainSearchResult(BaseModel):
     """A train search result."""
+    model_config = ConfigDict(populate_by_name=True)
+
     number: str
     name: str
     from_stn_code: str = Field(alias="fromStnCode")
     to_stn_code: str = Field(alias="toStnCode")
-
-    class Config:
-        populate_by_name = True
 
 
 class TrainSearchResponse(BaseModel):
@@ -44,18 +43,19 @@ class LatLng(BaseModel):
 
 class CurrentPosition(BaseModel):
     """Current position of the train."""
+    model_config = ConfigDict(populate_by_name=True)
+
     lat_lng: LatLng = Field(alias="latLng")
     station_code: str = Field(alias="stationCode")
     status: int
     distance_from_origin_km: float = Field(alias="distanceFromOriginKm")
     distance_from_last_station_km: float = Field(alias="distanceFromLastStationKm")
 
-    class Config:
-        populate_by_name = True
-
 
 class RouteStation(BaseModel):
     """A station in the train's route."""
+    model_config = ConfigDict(populate_by_name=True)
+
     platform_number: str = Field(alias="platformNumber")
     station_code: str = Field(alias="stationCode")
     station_name: str
@@ -73,9 +73,6 @@ class RouteStation(BaseModel):
     # Delay information (in seconds)
     scheduled_arrival_delay_secs: Optional[int] = Field(default=None, alias="scheduledArrivalDelaySecs")
     scheduled_departure_delay_secs: Optional[int] = Field(default=None, alias="scheduledDepartureDelaySecs")
-
-    class Config:
-        populate_by_name = True
 
     def get_arrival_delay_minutes(self) -> Optional[int]:
         """Get arrival delay in minutes."""
@@ -116,15 +113,14 @@ class RouteStation(BaseModel):
 
 class TrainStatusData(BaseModel):
     """Train status data from the API."""
+    model_config = ConfigDict(populate_by_name=True)
+
     current_position: CurrentPosition = Field(alias="currentPosition")
     arrival_status: str = Field(alias="arrivalStatus")
     last_updated_timestamp: int = Field(alias="lastUpdatedTimestamp")
     route: list[RouteStation]
     data_source: str = Field(alias="dataSource")
     unmapped_field_13: Optional[str] = Field(default=None, alias="unmappedField_13")
-
-    class Config:
-        populate_by_name = True
 
     def get_last_updated_datetime(self) -> datetime:
         """Convert last updated timestamp to datetime."""
@@ -133,8 +129,7 @@ class TrainStatusData(BaseModel):
 
 class TrainStatusResponse(BaseModel):
     """Root response from the train status API."""
+    model_config = ConfigDict(populate_by_name=True)
+
     success: bool
     data: TrainStatusData
-
-    class Config:
-        populate_by_name = True

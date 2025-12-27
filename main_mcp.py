@@ -8,7 +8,7 @@ from train_status_functions import (
     get_current_train_position,
 )
 
-mcp = FastMCP("PNR Status")
+mcp = FastMCP("Indian Railway Live Info")
 
 @mcp.tool
 async def get_confirm_status(pnr_no:str)->str:
@@ -61,40 +61,54 @@ async def get_waitlist_position(pnr_no:str) -> str:
     assert response.data.passengerList is not None
     return getWaitListPosition(response.data.passengerList)
 
+@mcp.tool
+async def get_train_no_from_pnr_no(pnr_no: str) -> str:
+    """
+    Get the train number and name from a PNR Number.
+
+    Args:
+        pnr_no: 10-digit PNR Code.
+    """
+    response = await fetch_pnr_details(pnr_no)
+    if not response:
+        return "Error in fetching API"
+    if not response.success or not response.data:
+        return f"user should double check the PNR number provided.\n{response.message}"
+    
+    return f"Train Number: {response.data.trainNumber}, Train Name: {response.data.trainName}"
+
 # Tools For geting train status and related tools 
 
 @mcp.tool
-async def get_live_train_status(train_number: str, train_date: str) -> str:
+async def get_live_train_status(train_number: str) -> str:
     """
     Get the current live status and position of an Indian Railways train.
     
     Args:
         train_number: The train number (e.g., "12618")
-        train_date: The journey date in DD-Mon-YYYY format (e.g., "26-Dec-2025")
     """
-    response = await fetch_train_status(train_number, train_date)
+    response = await fetch_train_status(train_number)
     if not response:
-        return "Error fetching train status. Please check the train number and date."
+        return "Error fetching train status. Please check the train number."
     if not response.success:
-        return "Train status not available. Please verify the train number and date."
+        return "Train status not available. Please verify the train number."
     
     return get_current_train_position(response)
 
 @mcp.tool
-async def get_train_arrival_at_station(train_number: str, train_date: str, station_code: str) -> str:
+async def get_train_arrival_at_station(train_number: str, station_code: str) -> str:
     """
     Get the expected arrival time of a train at a specific station.
     
     Args:
         train_number: The train number (e.g., "12618")
-        train_date: The journey date in DD-Mon-YYYY format (e.g., "26-Dec-2025")
         station_code: The station code to check arrival for (e.g., "HWH", "NDLS")
     """
-    response = await fetch_train_status(train_number, train_date)
+    response = await fetch_train_status(train_number)
     if not response:
-        return "Error fetching train status. Please check the train number and date."
+        return "Error fetching train status. Please check the train number."
     if not response.success:
-        return "Train status not available. Please verify the train number and date."
+        return "Train status not available. Please verify the train number."
     
     return get_expected_arrival_at_station(response, station_code)
 
