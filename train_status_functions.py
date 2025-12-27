@@ -199,11 +199,13 @@ def get_current_train_position(train_status: TrainStatusResponse) -> str:
     """
     position = train_status.data.current_position
     
-    # Find station name from route
+    # Find station name and delay info from route
     station_name = None
+    delay_secs = None
     for station in train_status.data.route:
         if station.station_code.upper() == position.station_code.upper():
             station_name = station.station_name
+            delay_secs = station.scheduled_arrival_delay_secs
             break
     
     # Build the result string
@@ -235,6 +237,21 @@ def get_current_train_position(train_status: TrainStatusResponse) -> str:
     
     # Overall arrival status
     result += f"  Arrival Status: {train_status.data.arrival_status}\n"
+    
+    # Current delay/early info
+    if delay_secs is not None and delay_secs > 0:
+        delay_mins = delay_secs // 60
+        if delay_mins >= 60:
+            delay_hrs = delay_mins // 60
+            remaining_mins = delay_mins % 60
+            result += f"  Current Delay: {delay_hrs}h {remaining_mins}m\n"
+        else:
+            result += f"  Current Delay: {delay_mins} mins\n"
+    elif delay_secs is not None and delay_secs < 0:
+        early_mins = abs(delay_secs) // 60
+        result += f"  Running Early: {early_mins} mins\n"
+    elif delay_secs == 0:
+        result += f"  Running: On Time\n"
     
     # Last updated time
     last_updated_dt = datetime.fromtimestamp(train_status.data.last_updated_timestamp, tz=IST)

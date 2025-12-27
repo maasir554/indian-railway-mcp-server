@@ -56,7 +56,7 @@ class RouteStation(BaseModel):
     """A station in the train's route."""
     model_config = ConfigDict(populate_by_name=True)
 
-    platform_number: str = Field(alias="platformNumber")
+    platform_number: Optional[str] = Field(default=None, alias="platformNumber")
     station_code: str = Field(alias="stationCode")
     station_name: str
     stop_index: int = Field(alias="stopIndex")
