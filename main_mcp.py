@@ -78,6 +78,24 @@ async def get_train_no_from_pnr_no(pnr_no: str) -> str:
     
     return f"Train Number: {response.data.trainNumber}, Train Name: {response.data.trainName}"
 
+@mcp.tool
+async def get_journey_overview(pnr_no: str) -> str:
+    """
+    Get basic journey information for a PNR - 
+    source/destination stations, ticket fare, date/time of journey
+    journey-class, ticket booked on, no. of passengers.
+    
+    Args:
+        pnr_no: 10-digit PNR Code.
+    """
+    response = await fetch_pnr_details(pnr_no)
+    if not response:
+        return "Error in fetching API"
+    if not response.success or not response.data:
+        return f"user should double check the PNR number provided.\n{response.message}"
+    
+    return getJourneyOverview(response)
+
 # Tools For geting train status and related tools 
 
 @mcp.tool

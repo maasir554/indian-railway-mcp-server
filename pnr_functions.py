@@ -75,3 +75,31 @@ def getWaitListPosition(passengers:List[Passenger]) -> str:
             position = "Already Confirmed"
         response += f"Passenger-{p.passengerSerialNumber}: {position[1]} in {decode_ticket_status(position[0])}({position[0]})\n"
     return response if response != "" else "Unable to get waitlist position."
+
+def getJourneyOverview(pnr_info: RailwaysAPIResponse | None) -> str:
+    """
+    Get basic info about the journey - source/destination stations, ticket fare, date/time of journey
+    
+    :param pnr_info: Description
+    :type pnr_info: RailwaysAPIResponse | None
+    :return: Description
+    :rtype: str
+    """
+    if not pnr_info:
+        return "Failed to receive source API response"
+    if not pnr_info.data:
+        return "Problem in API."
+    
+    assert pnr_info and pnr_info.data is not None
+    data = pnr_info.data
+    response = ""
+    response += f"Date of journey: {data.dateOfJourney}\n"
+    response += f"Source station: {data.sourceStation}\n"
+    response += f"Destination station: {data.destinationStation}\n"
+    response += f"Booked on: {data.bookingDate}\n"
+    response += f"Scheduled completion at: {data.arrivalDate}\n"
+    response += f"Ticket fare: {data.ticketFare}\n"
+    response += f"Journey class: {data.journeyClass}\n"
+    response += f"Number of passengers: {data.numberOfpassenger}"
+
+    return response
