@@ -11,7 +11,7 @@ from train_status_functions import (
 
 mcp = FastMCP("Indian Railway Live Info")
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def get_confirm_status(pnr_no:str)->str:
     """
     Get Indian Railways ticket confirmation Status of all passengers corresponding to a PNR Number.
@@ -28,7 +28,7 @@ async def get_confirm_status(pnr_no:str)->str:
     assert response.data.passengerList is not None
     return checkConfirmStatus(response.data.passengerList)
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def get_coaches_and_berths(pnr_no:str)->str:
     """
     Get the Coach IDs (or mumbers) and the Seat/Birth Details of all passengers corresponding to a PNR Number.
@@ -45,7 +45,7 @@ async def get_coaches_and_berths(pnr_no:str)->str:
     assert response.data.passengerList is not None
     return getCoachAndBerth(response.data.passengerList)
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def get_waitlist_position(pnr_no:str) -> str:
     """
     Get the updated position of passengers in waiting list corresponding to a PNR Number.
@@ -62,7 +62,7 @@ async def get_waitlist_position(pnr_no:str) -> str:
     assert response.data.passengerList is not None
     return getWaitListPosition(response.data.passengerList)
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def get_train_no_from_pnr_no(pnr_no: str) -> str:
     """
     Get the train number and name from a PNR Number.
@@ -78,13 +78,13 @@ async def get_train_no_from_pnr_no(pnr_no: str) -> str:
     
     return f"Train Number: {response.data.trainNumber}, Train Name: {response.data.trainName}"
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def get_journey_overview(pnr_no: str) -> str:
     """
     Get basic journey information for a PNR - 
     source/destination stations, ticket fare, date/time of journey
     journey-class, ticket booked on, no. of passengers.
-    
+
     Args:
         pnr_no: 10-digit PNR Code.
     """
@@ -98,7 +98,7 @@ async def get_journey_overview(pnr_no: str) -> str:
 
 # Tools For geting train status and related tools 
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def get_live_train_status(train_number: str) -> str:
     """
     Get the current live status and position of an Indian Railways train.
@@ -114,7 +114,7 @@ async def get_live_train_status(train_number: str) -> str:
     
     return get_current_train_position(response)
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def get_train_arrival_at_station(train_number: str, station_code: str) -> str:
     """
     Get the expected arrival time of a train at a specific station.
@@ -131,7 +131,7 @@ async def get_train_arrival_at_station(train_number: str, station_code: str) -> 
     
     return get_expected_arrival_at_station(response, station_code)
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def search_station_codes(station_name: str) -> str:
     """
     Search for Indian Railways station codes by station name.
@@ -148,7 +148,7 @@ async def search_station_codes(station_name: str) -> str:
         response += f"  • {station.name} - Code: {station.code}\n"
     return response
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def search_train_numbers(train_name: str) -> str:
     """
     Search for Indian Railways train numbers by train name.
@@ -165,7 +165,7 @@ async def search_train_numbers(train_name: str) -> str:
         response += f"  • {train.number} - {train.name} ({train.from_stn_code} → {train.to_stn_code})\n"
     return response
 
-@mcp.tool
+@mcp.tool(annotations={"readOnlyHint": True})
 async def get_train_complete_route(train_number: str) -> str:
     """
     Get the complete route of a train showing all stations in sequence.
