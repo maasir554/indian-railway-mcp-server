@@ -26,10 +26,9 @@ def fetch_pnr_status(pnr_no: str) -> PNRResponse | None:
     assert PNR_API_PATH is not None
     assert PNR_API_KEY_NAME is not None
     url = PNR_API_PATH
-    base_url = url.rsplit('/', 1)[0]
     
     with httpx.Client() as client:
-        initial_response = client.get(base_url)
+        initial_response = client.get(url)
         api_key = client.cookies.get(PNR_API_KEY_NAME)
 
         if not api_key:
