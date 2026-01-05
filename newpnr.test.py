@@ -32,6 +32,47 @@ def test_fetch_pnr_status():
         print(f"  Passenger {passenger.Number}: {passenger.CurrentStatus}")
 
 
+def test_invalid_length_pnr():
+    """Test that PNR with invalid length returns None without API call."""
+    # Too short
+    assert fetch_pnr_status("123456789") is None
+    print("✓ 9 digit PNR returns None")
+    
+    # Too long
+    assert fetch_pnr_status("12345678901") is None
+    print("✓ 11 digit PNR returns None")
+    
+    # Empty
+    assert fetch_pnr_status("") is None
+    print("✓ Empty PNR returns None")
+    
+    # Non-numeric
+    assert fetch_pnr_status("abcdefghij") is None
+    print("✓ Non-numeric PNR returns None")
+    
+    # Mixed
+    assert fetch_pnr_status("12345abcde") is None
+    print("✓ Mixed alphanumeric PNR returns None")
+
+
+def test_invalid_pnr_value():
+    """Test that valid format but non-existent PNR returns None."""
+    result = fetch_pnr_status("0000000000")
+    assert result is None
+    print("✓ Invalid PNR (0000000000) returns None")
+
+
 if __name__ == "__main__":
+    print("Test 1: Valid PNR")
     test_fetch_pnr_status()
-    print("\n✅ Test passed!")
+    print("\n✅ Valid PNR test passed!\n")
+    
+    print("Test 2: Invalid length PNR")
+    test_invalid_length_pnr()
+    print("\n✅ Invalid length PNR test passed!\n")
+    
+    print("Test 3: Invalid PNR value")
+    test_invalid_pnr_value()
+    print("\n✅ Invalid PNR value test passed!\n")
+    
+    print("🎉 All tests passed!")

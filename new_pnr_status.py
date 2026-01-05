@@ -9,16 +9,20 @@ load_dotenv()
 PNR_API_PATH = os.getenv("NEW_PNR_API_PATH")
 PNR_API_KEY_NAME = os.getenv("NEW_PNR_API_KEY_NAME")
 
-def fetch_pnr_status(pnr_no: str) -> PNRResponse:
+def fetch_pnr_status(pnr_no: str) -> PNRResponse | None:
     """
     Fetch PNR status from Live API.
     
     Args:
-        pnr_no: The PNR number to check
+        pnr_no: The PNR number to check (must be 10 digits)
         
     Returns:
-        PNRResponse object containing the PNR status data
+        PNRResponse object containing the PNR status data, or None if PNR is invalid
     """
+    # Validate PNR length - must be exactly 10 digits
+    if len(pnr_no) != 10 or not pnr_no.isdigit():
+        return None
+    
     assert PNR_API_PATH is not None
     assert PNR_API_KEY_NAME is not None
     url = PNR_API_PATH
@@ -42,4 +46,9 @@ def fetch_pnr_status(pnr_no: str) -> PNRResponse:
         response.raise_for_status()
         
         data = response.json()
+        
+        # Check if API returned an error (PNR not found)
+        if data.get("status") is False:
+            return None
+        
         return PNRResponse(**data)

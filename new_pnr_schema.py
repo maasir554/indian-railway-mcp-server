@@ -85,4 +85,4 @@ class PNRResponse(BaseModel):
     status: bool
     message: str
     timestamp: int
-    data: PNRData
+    data: Optional[PNRData] = None
