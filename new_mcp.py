@@ -66,6 +66,27 @@ def get_current_date_time() -> str:
     )
 
 
+@mcp.tool(annotations={"readOnlyHint": True})
+def get_date_difference(date1: str, date2: str) -> str:
+    """
+    Calculate the absolute difference in days between two dates.
+    
+    Args:
+        date1: First date in dd-mm-yyyy format (e.g., "09-01-2026")
+        date2: Second date in dd-mm-yyyy format (e.g., "10-01-2026")
+    
+    Returns:
+        The absolute difference in days between the two dates.
+    """
+    try:
+        d1 = datetime.strptime(date1, "%d-%m-%Y").date()
+        d2 = datetime.strptime(date2, "%d-%m-%Y").date()
+        diff = abs((d2 - d1).days)
+        return f"Difference between {date1} and {date2}: {diff} day(s)"
+    except ValueError as e:
+        return f"Error: Invalid date format. Please use dd-mm-yyyy format. Details: {e}"
+
+
 # ==================== PNR Status Tools ====================
 
 @mcp.tool(annotations={"readOnlyHint": True})
