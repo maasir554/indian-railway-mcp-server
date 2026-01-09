@@ -18,6 +18,7 @@ from new_train_status_functions import (
     get_train_route,
     get_upcoming_stations,
     get_train_summary,
+    get_last_stop_station,
 )
 # Import older functions for station/train search (not available in new function set)
 from train_status_functions import (
@@ -318,6 +319,22 @@ async def get_next_stations(train_number: str, start_day: int = 0, limit: int = 
         return "Error fetching train status. Please check the train number and start_day."
     
     return get_upcoming_stations(response, limit)
+
+
+@mcp.tool(annotations={"readOnlyHint": True})
+async def get_last_halt_station(train_number: str, start_day: int = 0) -> str:
+    """
+    Get the last station where the train made a stop (excluding non-halt/passing stations).
+    
+    Args:
+        train_number: The train number (e.g., "12618")
+        start_day: Days ago the train started from source (0 = today, 1 = yesterday, etc.)
+    """
+    response = await fetch_new_train_status(train_number, start_day)
+    if response is None:
+        return "Error fetching train status. Please check the train number and start_day."
+    
+    return get_last_stop_station(response)
 
 
 @mcp.tool(annotations={"readOnlyHint": True})

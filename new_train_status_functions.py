@@ -26,6 +26,11 @@ async def fetch_new_train_status(train_number: str, start_day: int = 0) -> NewTr
     """
     Fetch live train status from the RailYatri API.
     
+    Note: the start_day parameter can change when the conversation is going on. 
+    hence is it recommended to consider absolute start date of train 
+    and the current time to get it, every time we call this.
+    also mention the date returned in the response to calculate start_day for future response
+    
     Args:
         train_number: The train number (e.g., "12138")
         start_day: Days ago the train started (0 = today, 1 = yesterday, 2 = day before yesterday, etc.)
@@ -91,6 +96,7 @@ def get_expected_arrival_at_station(train_status: NewTrainStatusResponse, statio
     if data.current_station_code.upper() == station_code_upper:
         result = f"Train is currently at/near {data.current_station_name} ({station_code_upper})\n"
         result += f"  Status: {data.status_as_of}\n"
+        result += f"  Train Start Date: {data.train_start_date}\n"
         if data.eta:
             result += f"  ETA: {data.eta}\n"
         if data.delay > 0:
@@ -101,6 +107,7 @@ def get_expected_arrival_at_station(train_status: NewTrainStatusResponse, statio
     for station in data.upcoming_stations:
         if station.station_code.upper() == station_code_upper:
             result = f"Arrival at {station.station_name} ({station_code_upper}):\n"
+            result += f"  Train Start Date: {data.train_start_date}\n"
             if station.sta:
                 result += f"  Scheduled Arrival: {station.sta}\n"
             if station.eta:
@@ -117,6 +124,7 @@ def get_expected_arrival_at_station(train_status: NewTrainStatusResponse, statio
     for station in data.previous_stations:
         if station.station_code.upper() == station_code_upper:
             result = f"Train has already passed {station.station_name} ({station_code_upper}):\n"
+            result += f"  Train Start Date: {data.train_start_date}\n"
             if station.sta:
                 result += f"  Scheduled Arrival: {station.sta}\n"
             if station.eta:
@@ -134,7 +142,7 @@ def get_expected_arrival_at_station(train_status: NewTrainStatusResponse, statio
             if non_stop.station_code.upper() == station_code_upper:
                 return f"{non_stop.station_name} ({station_code_upper}) is a non-stop station. Train does not halt here."
     
-    return f"Station {station_code_upper} not found in the train's route"
+    return f"Station {station_code_upper} not found in the train's route (Train Start Date: {data.train_start_date})"
 
 
 def get_current_train_position(train_status: NewTrainStatusResponse) -> str:
@@ -150,6 +158,7 @@ def get_current_train_position(train_status: NewTrainStatusResponse) -> str:
     data = train_status.data
     
     result = f"Current Train Position - {data.train_name} ({data.train_number}):\n"
+    result += f"  Train Start Date: {data.train_start_date}\n"
     result += f"  Route: {data.source_stn_name} ({data.source}) → {data.dest_stn_name} ({data.destination})\n"
     result += "\n"
     
@@ -248,7 +257,12 @@ def get_train_route(train_status: NewTrainStatusResponse, include_non_stops: boo
     # Join with arrows
     route_string = " -> ".join(station_entries)
     
-    return route_string
+    # Include train start date for start_day calculation
+    result = f"Train: {data.train_name} ({data.train_number})\n"
+    result += f"Train Start Date: {data.train_start_date}\n\n"
+    result += route_string
+    
+    return result
 
 
 def get_upcoming_stations(train_status: NewTrainStatusResponse, limit: int = 5) -> str:
@@ -267,7 +281,8 @@ def get_upcoming_stations(train_status: NewTrainStatusResponse, limit: int = 5) 
     if not data.upcoming_stations:
         return "No upcoming stations available"
     
-    result = f"Upcoming Stations for {data.train_name} ({data.train_number}):\n\n"
+    result = f"Upcoming Stations for {data.train_name} ({data.train_number}):\n"
+    result += f"Train Start Date: {data.train_start_date}\n\n"
     
     count = 0
     for station in data.upcoming_stations:
@@ -317,6 +332,7 @@ def get_train_summary(train_status: NewTrainStatusResponse) -> str:
     data = train_status.data
     
     result = f"{data.train_name} ({data.train_number})\n"
+    result += f"Train Start Date: {data.train_start_date}\n"
     result += f"{data.source_stn_name} → {data.dest_stn_name}\n\n"
     
     # Current position
@@ -358,5 +374,42 @@ def get_train_start_date(train_status: NewTrainStatusResponse) -> date | None:
         return datetime.strptime(train_status.data.train_start_date, "%Y-%m-%d").date()
     except (ValueError, AttributeError):
         return None
-    
 
+
+def get_last_stop_station(train_status: NewTrainStatusResponse) -> str:
+    """
+    Get the last station where the train made a stop (excluding non-halt stations).
+    
+    Args:
+        train_status: The NewTrainStatusResponse object from fetch_new_train_status
+    
+    Returns:
+        A formatted string with the last stop station details
+    """
+    data = train_status.data
+    
+    if not data.previous_stations:
+        return f"No previous stations available. Train may be at or near source station. (Train Start Date: {data.train_start_date})"
+    
+    # Find the last station with halt > 0 (stations where train actually stopped)
+    # Previous stations are in order from source, so we reverse to find the last stop
+    for station in reversed(data.previous_stations):
+        if station.halt > 0 or station.si_no == 1:  # Include source station even if halt=0
+            result = f"Last Stop: {station.station_name} ({station.station_code})\n"
+            if station.sta:
+                result += f"  Scheduled Arrival: {station.sta}\n"
+            if station.eta:
+                result += f"  Actual Arrival: {station.eta}\n"
+            if station.arrival_delay != 0:
+                result += f"  {format_delay(station.arrival_delay)}\n"
+            if station.halt > 0:
+                result += f"  Halt Duration: {station.halt} min\n"
+            if station.platform_number:
+                result += f"  Platform: {station.platform_number}\n"
+            result += f"  Distance from Source: {station.distance_from_source} km\n"
+            result += f"  Train Start Date: {data.train_start_date}"
+            return result
+    
+    # If no halt station found, return the last station in the list
+    station = data.previous_stations[-1]
+    return f"Last Passed Station: {station.station_name} ({station.station_code})\n  Distance from Source: {station.distance_from_source} km\n  Train Start Date: {data.train_start_date}"
