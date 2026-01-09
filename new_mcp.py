@@ -14,6 +14,7 @@ from new_pnr_status import (
 from new_train_status_functions import (
     fetch_new_train_status,
     get_expected_arrival_at_station,
+    get_expected_departure_at_station,
     get_current_train_position,
     get_train_route,
     get_upcoming_stations,
@@ -275,6 +276,23 @@ async def get_train_arrival_at_station(train_number: str, station_code: str, sta
         return "Error fetching train status. Please check the train number and start_day."
     
     return get_expected_arrival_at_station(response, station_code)
+
+
+@mcp.tool(annotations={"readOnlyHint": True})
+async def get_train_departure_at_station(train_number: str, station_code: str, start_day: int = 0) -> str:
+    """
+    Get the expected departure time of a train from a specific station.
+    
+    Args:
+        train_number: The train number (e.g., "12618")
+        station_code: The station code to check departure for (e.g., "HWH", "NDLS")
+        start_day: Days ago the train started from source (0 = today, 1 = yesterday, etc.)
+    """
+    response = await fetch_new_train_status(train_number, start_day)
+    if response is None:
+        return "Error fetching train status. Please check the train number and start_day."
+    
+    return get_expected_departure_at_station(response, station_code)
 
 
 @mcp.tool(annotations={"readOnlyHint": True})

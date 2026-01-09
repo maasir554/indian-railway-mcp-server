@@ -145,6 +145,79 @@ def get_expected_arrival_at_station(train_status: NewTrainStatusResponse, statio
     return f"Station {station_code_upper} not found in the train's route (Train Start Date: {data.train_start_date})"
 
 
+def get_expected_departure_at_station(train_status: NewTrainStatusResponse, station_code: str) -> str:
+    """
+    Get the expected departure date and time of a train at a particular station.
+    
+    Args:
+        train_status: The NewTrainStatusResponse object from fetch_new_train_status
+        station_code: The station code to check (e.g., "KCG")
+    
+    Returns:
+        A formatted string with departure information
+    """
+    station_code_upper = station_code.upper()
+    data = train_status.data
+    
+    # Check if it's the current station
+    if data.current_station_code.upper() == station_code_upper:
+        result = f"Train is currently at/near {data.current_station_name} ({station_code_upper})\n"
+        result += f"  Status: {data.status_as_of}\n"
+        result += f"  Train Start Date: {data.train_start_date}\n"
+        if data.cur_stn_std:
+            result += f"  Scheduled Departure: {data.cur_stn_std}\n"
+        if data.etd:
+            result += f"  Expected Departure: {data.etd}\n"
+        if data.delay > 0:
+            result += f"  {format_delay(data.delay)}"
+        return result
+    
+    # Search in upcoming stations
+    for station in data.upcoming_stations:
+        if station.station_code.upper() == station_code_upper:
+            result = f"Departure from {station.station_name} ({station_code_upper}):\n"
+            result += f"  Train Start Date: {data.train_start_date}\n"
+            if station.std:
+                result += f"  Scheduled Departure: {station.std}\n"
+            if station.etd:
+                result += f"  Expected Departure: {station.etd}\n"
+            if station.arrival_delay != 0:
+                result += f"  {format_delay(station.arrival_delay)}\n"
+            if station.halt:
+                result += f"  Halt Duration: {station.halt} min\n"
+            if station.platform_number:
+                result += f"  Platform: {station.platform_number}\n"
+            if station.distance_from_current_station_txt:
+                result += f"  Distance: {station.distance_from_current_station_txt}"
+            return result
+    
+    # Search in previous stations
+    for station in data.previous_stations:
+        if station.station_code.upper() == station_code_upper:
+            result = f"Train has already departed from {station.station_name} ({station_code_upper}):\n"
+            result += f"  Train Start Date: {data.train_start_date}\n"
+            if station.std:
+                result += f"  Scheduled Departure: {station.std}\n"
+            if station.etd:
+                result += f"  Actual Departure: {station.etd}\n"
+            if station.arrival_delay != 0:
+                result += f"  {format_delay(station.arrival_delay)}\n"
+            if station.halt:
+                result += f"  Halt Duration: {station.halt} min\n"
+            if station.platform_number:
+                result += f"  Platform: {station.platform_number}"
+            return result
+    
+    # Check in non-stop stations
+    all_stations = data.upcoming_stations + data.previous_stations
+    for station in all_stations:
+        for non_stop in station.non_stops:
+            if non_stop.station_code.upper() == station_code_upper:
+                return f"{non_stop.station_name} ({station_code_upper}) is a non-stop station. Train does not halt here."
+    
+    return f"Station {station_code_upper} not found in the train's route (Train Start Date: {data.train_start_date})"
+
+
 def get_current_train_position(train_status: NewTrainStatusResponse) -> str:
     """
     Get the current position of a train.
