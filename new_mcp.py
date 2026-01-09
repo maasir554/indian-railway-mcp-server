@@ -1,5 +1,5 @@
 from fastmcp import FastMCP
-from datetime import date
+from datetime import date, datetime, timezone, timedelta
 from new_pnr_status import (
     fetch_pnr_status,
     get_train_start_date as get_pnr_train_start_date,
@@ -27,6 +27,9 @@ from train_status_functions import (
 
 mcp = FastMCP("Indian Railway Live Info (New)")
 
+# Indian Standard Time offset (UTC+5:30)
+IST = timezone(timedelta(hours=5, minutes=30))
+
 
 def calculate_start_day(train_source_date: date | None) -> int:
     """
@@ -44,6 +47,22 @@ def calculate_start_day(train_source_date: date | None) -> int:
     today = date.today()
     delta = today - train_source_date
     return max(0, delta.days)  # Ensure non-negative
+
+
+# ==================== Utility Tools ====================
+
+@mcp.tool(annotations={"readOnlyHint": True})
+def get_current_date_time() -> str:
+    """
+    Get the current date and time in Indian Standard Time (IST).
+    Useful for calculating days until journey, checking if a train has departed, etc.
+    """
+    now_ist = datetime.now(IST)
+    return (
+        f"Current Date & Time (IST): {now_ist.strftime('%d %B %Y, %I:%M %p')}\n"
+        f"Date: {now_ist.strftime('%d-%m-%Y')}\n"
+        f"Day: {now_ist.strftime('%A')}"
+    )
 
 
 # ==================== PNR Status Tools ====================
