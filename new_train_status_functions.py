@@ -33,7 +33,7 @@ async def fetch_new_train_status(train_number: str, start_day: int = 0) -> NewTr
     
     Args:
         train_number: The train number (e.g., "12138")
-        start_day: Days ago the train started (0 = today, 1 = yesterday, 2 = day before yesterday, etc.)
+        start_day: Days ago the train started from now (0 = today, 1 = yesterday, 2 = day before yesterday, etc.). mathematically, start_date = current_date - train_start_date  
     
     Returns:
         NewTrainStatusResponse if successful, None otherwise
