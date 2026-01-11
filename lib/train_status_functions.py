@@ -2,12 +2,8 @@ import os
 from datetime import datetime, timezone, timedelta, date
 from dotenv import load_dotenv
 import httpx
-from new_train_status_schemas import (
+from schemas.train_status_schemas import (
     NewTrainStatusResponse,
-    UpcomingStation,
-    PreviousStation,
-)
-from train_status_schemas import (
     StationSearchResponse,
     StationSearchResult,
     TrainSearchResponse,
@@ -17,7 +13,7 @@ from train_status_schemas import (
 load_dotenv()
 
 NEW_TRAIN_STATUS_API_BASE = os.getenv("NEW_TRAIN_STATUS_API_BASE")
-
+TRAIN_STATUS_API_BASE = os.getenv("TRAIN_STATUS_API_BASE")
 
 # Indian Standard Time offset (UTC+5:30)
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -486,3 +482,80 @@ def get_last_stop_station(train_status: NewTrainStatusResponse) -> str:
     # If no halt station found, return the last station in the list
     station = data.previous_stations[-1]
     return f"Last Passed Station: {station.station_name} ({station.station_code})\n  Distance from Source: {station.distance_from_source} km\n  Train Start Date: {data.train_start_date}"
+
+# UTILITIES:
+
+
+async def get_station_codes_from_name(station_name: str, limit: int = 8) -> list[StationSearchResult]:
+    """
+    Search for station codes by station name.
+    
+    Args:
+        station_name: The station name to search for (e.g., "rani kamla")
+        limit: Maximum number of results to return (default: 8)
+    
+    Returns:
+        List of StationSearchResult with code and name
+    """
+    assert TRAIN_STATUS_API_BASE is not None, "TRAIN_STATUS_API_BASE environment variable is not set"
+    
+    url = f"{TRAIN_STATUS_API_BASE}/search"
+    params = {
+        "type": "station",
+        "q": station_name,
+        "limit": limit
+    }
+
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        try:
+            response = await client.get(url, params=params, timeout=30.0)
+            response.raise_for_status()
+            result = StationSearchResponse(**response.json())
+            return result.data
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error searching stations: {e}")
+            return []
+        except httpx.RequestError as e:
+            print(f"Request error searching stations: {e}")
+            return []
+        except Exception as e:
+            print(f"Error parsing station search response: {e}")
+            return []
+
+
+async def get_train_numbers_from_name(train_name: str, limit: int = 8) -> list[TrainSearchResult]:
+    """
+    Search for train numbers by train name.
+    
+    Args:
+        train_name: The train name to search for (e.g., "Punjab")
+        limit: Maximum number of results to return (default: 8)
+    
+    Returns:
+        List of TrainSearchResult with number, name, fromStnCode, and toStnCode
+    """
+    assert TRAIN_STATUS_API_BASE is not None, "TRAIN_STATUS_API_BASE environment variable is not set"
+    
+    url = f"{TRAIN_STATUS_API_BASE}/search"
+    params = {
+        "type": "train",
+        "q": train_name,
+        "limit": limit
+    }
+
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        try:
+            response = await client.get(url, params=params, timeout=30.0)
+            response.raise_for_status()
+            result = TrainSearchResponse(**response.json())
+            return result.data
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error searching trains: {e}")
+            return []
+        except httpx.RequestError as e:
+            print(f"Request error searching trains: {e}")
+            return []
+        except Exception as e:
+            print(f"Error parsing train search response: {e}")
+            return []
+

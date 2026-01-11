@@ -1,10 +1,10 @@
 import httpx
-from new_pnr_schema import PNRResponse, PassengerStatus
+from schemas.pnr_schemas import PNRResponse
 import os
 from datetime import datetime, date
 from dotenv import load_dotenv
 from urllib.parse import unquote
-from status_decoders import decode_ticket_status, decode_berth
+from utils.status_decoders import decode_ticket_status, decode_berth
 
 load_dotenv()
 

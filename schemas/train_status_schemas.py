@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 
 
@@ -212,3 +212,34 @@ class NewTrainStatusResponse(BaseModel):
     def get_remaining_distance(self) -> int:
         """Get remaining distance to destination in km."""
         return self.total_distance - self.distance_from_source
+
+class StationSearchResult(BaseModel):
+    """A station search result."""
+    code: str
+    name: str
+
+
+class StationSearchResponse(BaseModel):
+    """Response from station search API."""
+    success: bool
+    data: list[StationSearchResult]
+    total: int
+    query: str
+
+
+class TrainSearchResult(BaseModel):
+    """A train search result."""
+    model_config = ConfigDict(populate_by_name=True)
+
+    number: str
+    name: str
+    from_stn_code: str = Field(alias="fromStnCode")
+    to_stn_code: str = Field(alias="toStnCode")
+
+
+class TrainSearchResponse(BaseModel):
+    """Response from train search API."""
+    success: bool
+    data: list[TrainSearchResult]
+    total: int
+    query: str

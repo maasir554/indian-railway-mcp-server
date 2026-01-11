@@ -53,109 +53,60 @@ https://indian-railways-live-status.fastmcp.app/mcp
 
 ---
 
-## Available Tools
+## What You Can Do
 
-### Utility Tools
+### 🎫 PNR Status
+- Check if your ticket is confirmed or waitlisted
+- Get your coach number and seat/berth details
+- View complete passenger list with booking status
+- See journey details: stations, date, time, class, fare
 
-| Tool | Description |
-|------|-------------|
-| `get_current_date_time` | Get current date and time in Indian Standard Time (IST) |
-| `get_date_difference` | Calculate absolute difference in days between two dates (format: dd-mm-yyyy) |
+### 🚂 Live Train Tracking
+- Track real-time location of any train
+- Check current delay and expected arrival times
+- See which station the train just crossed or stopped at
+- View upcoming stations with estimated times
+- Get the complete route of any train
 
----
+### 🔍 Search
+- Find station codes by name
+- Search train numbers by train name
 
-̌̌̌̌̌̌### PNR Status Tools
+### 🔗 Smart PNR + Train Integration
+- Track your train directly using PNR (no need to enter train number or dates)
+- Automatic date calculation for multi-day journeys
 
-All PNR tools accept a `pnr_no` parameter (10-digit PNR code, e.g., `"8341223680"`).
+### 📅 Utilities
+- Get current Indian Standard Time (IST)
+- Calculate days between two dates
 
-| Tool | Description |
-|------|-------------|
-| `get_confirm_status` | Get ticket confirmation status of all passengers |
-| `get_coaches_and_berths` | Get coach IDs and seat/berth details for all passengers |
-| `get_pnr_waitlist_position` | Get updated waitlist position for passengers |
-| `get_train_no_from_pnr_no` | Get train number and name from PNR |
-| `get_pnr_journey_overview` | Get journey info: stations, fare, date/time, class, passengers |
-| `get_pnr_passenger_summary` | Get summary of all passengers with status, coach, and berth |
-| `get_complete_pnr_summary` | Get comprehensive PNR summary with all details |
-
----
-
-### Train Status Tools
-
-| Tool | Parameters | Description |
-|------|------------|-------------|
-| `get_live_train_status` | `train_number`, `start_day` | Get current live position and status of a train |
-| `get_train_status_using_pnr` | `pnr_no` | Get live train status using PNR (auto-calculates correct date) |
-| `get_train_arrival_at_station` | `train_number`, `station_code`, `start_day` | Get expected arrival time at a station |
-| `get_train_departure_at_station` | `train_number`, `station_code`, `start_day` | Get expected departure time from a station |
-| `get_train_arrival_using_pnr` | `pnr_no`, `station_code` | Get arrival time at station using PNR |
-| `get_train_complete_route` | `train_number`, `start_day`, `include_non_stops` | Get complete route with all stations |
-| `get_next_stations` | `train_number`, `start_day`, `limit` | Get upcoming stations with arrival times and delays |
-| `get_last_halt_station` | `train_number`, `start_day` | Get last station where train stopped |
-| `get_brief_train_summary` | `train_number`, `start_day` | Get brief summary of train's current status |
-
-#### Parameter Reference
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `train_number` | string | Train number (e.g., `"12618"`, `"12138"`) |
-| `station_code` | string | Station code (e.g., `"HWH"`, `"NDLS"`, `"CSMT"`) |
-| `start_day` | integer | Days ago train started from source: `0` = today, `1` = yesterday, `2` = day before, etc. |
-| `include_non_stops` | boolean | Whether to include non-halt stations in route (default: `false`) |
-| `limit` | integer | Maximum stations to show (default: `5`) |
+> 📖 For technical details and tool reference, see [DEVELOPER.md](DEVELOPER.md)
 
 ---
 
-### Search Tools
+## Example Conversation
 
-| Tool | Parameters | Description |
-|------|------------|-------------|
-| `search_station_codes` | `station_name` | Search station codes by name (e.g., "Howrah", "New Delhi") |
-| `search_train_numbers` | `train_name` | Search train numbers by name (e.g., "Rajdhani", "Punjab Mail") |
+A typical user journey tracking their train:
 
----
+> My PNR is 834XXXXXXX. Is my ticket confirmed?
 
-### Combined PNR + Train Status Tools
+> Which coach and berth am I in?
 
-| Tool | Parameters | Description |
-|------|------------|-------------|
-| `get_full_journey_status` | `pnr_no` | Complete journey status: PNR details + live train position + upcoming stations |
+> What train is this and when does it depart?
 
----
+> Where is my train right now?
 
-## Example Usage
+> How much delay is there?
 
-```
-User: Check PNR status for 8341223680
-Assistant: [Uses get_complete_pnr_summary tool]
+> What was the last station it crossed?
 
-User: Where is train 12618 right now?
-Assistant: [Uses get_live_train_status tool]
+> Where did it stop last?
 
-User: When will Punjab Mail arrive at Mathura?
-Assistant: [Uses search_train_numbers then get_train_arrival_at_station]
+> What are the next upcoming stations?
 
-User: What's the station code for Howrah?
-Assistant: [Uses search_station_codes tool]
+> When will it reach my destination?
 
-User: Track my train using PNR 2341567890
-Assistant: [Uses get_full_journey_status tool - automatically handles dates]
-```
-
----
-
-## Understanding `start_day` Parameter
-
-The `start_day` parameter is crucial for tracking trains correctly:
-
-- `0` = Train started **today**
-- `1` = Train started **yesterday**
-- `2` = Train started **2 days ago**
-
-**Why is this needed?**  
-Long-distance trains can run for 2-3 days. If you're tracking a train that left yesterday, you need `start_day=1`.
-
-**Pro Tip:** Use the PNR-based tools (`get_train_status_using_pnr`, `get_full_journey_status`) which **automatically calculate** the correct `start_day` from your ticket's journey date.
+> Show me the complete route of my train
 
 ---
 
