@@ -53,6 +53,32 @@ https://indian-railways-live-status.fastmcp.app/mcp
 
 ---
 
+## Example Conversation
+
+A typical user journey tracking their train:
+
+> My PNR is 834XXXXXXX. Is my ticket confirmed?
+
+> Which coach and berth am I in?
+
+> What train is this and when does it depart?
+
+> Where is my train right now?
+
+> How much delay is there?
+
+> What was the last station it crossed?
+
+> Where did it stop last?
+
+> What are the next upcoming stations?
+
+> When will it reach my destination?
+
+> Show me the complete route of my train
+
+---
+
 ## What You Can Do
 
 ### 🎫 PNR Status
@@ -84,31 +110,6 @@ https://indian-railways-live-status.fastmcp.app/mcp
 
 ---
 
-## Example Conversation
-
-A typical user journey tracking their train:
-
-> My PNR is 834XXXXXXX. Is my ticket confirmed?
-
-> Which coach and berth am I in?
-
-> What train is this and when does it depart?
-
-> Where is my train right now?
-
-> How much delay is there?
-
-> What was the last station it crossed?
-
-> Where did it stop last?
-
-> What are the next upcoming stations?
-
-> When will it reach my destination?
-
-> Show me the complete route of my train
-
----
 
 ## Disclaimer
 
