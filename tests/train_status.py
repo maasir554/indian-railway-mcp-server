@@ -1,6 +1,5 @@
 """Tests for new train status functions."""
 
-import asyncio
 import json
 import pytest
 from lib.schema.train import NewTrainStatusResponse
