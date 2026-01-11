@@ -1,10 +1,10 @@
 import httpx
-from schemas.pnr_schemas import PNRResponse
+from lib.schema.pnr import PNRResponse
 import os
 from datetime import datetime, date
 from dotenv import load_dotenv
 from urllib.parse import unquote
-from utils.status_decoders import decode_ticket_status, decode_berth
+from lib.pnr_status_decoders import decode_ticket_status, decode_berth
 
 load_dotenv()
 

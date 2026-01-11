@@ -1,6 +1,6 @@
 from fastmcp import FastMCP
 from datetime import date, datetime, timezone, timedelta
-from lib.pnr_status_functions import (
+from lib.pnr import (
     fetch_pnr_status,
     get_train_start_date as get_pnr_train_start_date,
     get_train_number,
@@ -11,7 +11,7 @@ from lib.pnr_status_functions import (
     get_passenger_summary,
     get_pnr_summary,
 )
-from lib.train_status_functions import (
+from lib.train import (
     fetch_new_train_status,
     get_expected_arrival_at_station,
     get_expected_departure_at_station,

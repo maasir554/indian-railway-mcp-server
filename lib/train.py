@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timezone, timedelta, date
 from dotenv import load_dotenv
 import httpx
-from schemas.train_status_schemas import (
+from lib.schema.train import (
     NewTrainStatusResponse,
     StationSearchResponse,
     StationSearchResult,

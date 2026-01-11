@@ -1,4 +1,4 @@
-from lib.pnr_status_functions import (
+from lib.pnr import (
     fetch_pnr_status,
     get_train_start_date,
     get_train_number,
@@ -9,7 +9,7 @@ from lib.pnr_status_functions import (
     get_passenger_summary,
     get_pnr_summary,
 )
-from schemas.pnr_schemas import PNRResponse
+from lib.schema.pnr import PNRResponse
 from datetime import date
 
 

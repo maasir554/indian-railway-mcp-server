@@ -3,8 +3,8 @@
 import asyncio
 import json
 import pytest
-from schemas.train_status_schemas import NewTrainStatusResponse
-from lib.train_status_functions import (
+from lib.schema.train import NewTrainStatusResponse
+from lib.train import (
     fetch_new_train_status,
     format_delay,
     get_expected_arrival_at_station,
